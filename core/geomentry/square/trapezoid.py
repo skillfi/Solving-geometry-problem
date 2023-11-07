@@ -5,7 +5,7 @@ class Trapezoid(Shape):
     """Підклас, який представляє трапецію."""
 
     def __init__(self, top_length, bottom_length, height):
-        super().__init()  # Викликаємо конструктор батьківського класу
+        super().__init__() # Викликаємо конструктор батьківського класу
         self.top_length = top_length  # Довжина верхньої сторони трапеції
         self.bottom_length = bottom_length  # Довжина нижньої сторони трапеції
         self.height = height  # Висота трапеції

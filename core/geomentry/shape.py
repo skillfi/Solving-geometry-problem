@@ -33,20 +33,12 @@ class Shape:
             self.points[point] = [x, y]
             self.convert_to_df()
 
-
     def convert_to_df(self):
         df = pd.DataFrame(self.points)
         self.df = df
 
     @classmethod
     def from_side_length(cls, side_length):
-        """Створює екземпляр класу Shape з довжиною сторони."""
-        obj = cls()  # створює новий об'єкт класу Shape
-        obj.side_length = side_length  # зберігає довжину сторони як атрибут об'єкта
-        return obj  # повертає об'єкт
-
-    @classmethod
-    def from_triangle_segments(cls, side_length):
         """Створює екземпляр класу Shape з довжиною сторони."""
         obj = cls()  # створює новий об'єкт класу Shape
         obj.side_length = side_length  # зберігає довжину сторони як атрибут об'єкта

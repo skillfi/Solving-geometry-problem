@@ -32,23 +32,3 @@ class RightTriangle(Triangle):
     def perimeter(self):
         """Повертає периметр прямокутного трикутника за формулою P = a + b + c."""
         return self.side_length + self.height + self.hypotenuse  # сума всіх сторін трикутника
-
-    def init_points(self, points: str, **kwargs):
-        for i, point in enumerate(points):
-            x, y = self.vertices[i]  # розпаковує координати вершини
-            # Оновлює словник та датафрейм з іменами вершин та їх координатами
-            self.named_vertices['Point'].append(point)
-            self.named_vertices['X'].append(x)
-            self.named_vertices['Y'].append(y)
-            self.points[point] = [x, y]
-            self.convert_to_df()
-            # Якщо кут дорівнює 90 градусам, то змінює координати точки на протилежну вершину
-            if self.angle.get(point) == 90:
-                opposite_index = (i + 2) % 3  # знаходить індекс протилежної вершини
-                opposite_point = points[opposite_index+1]  # знаходить ім'я протилежної вершини
-                self.points[point], self.points[opposite_point] = self.points[opposite_point], self.points[
-                    point]  # обмінює координати точок
-                self.convert_to_df()  # оновлює датафрейм з новими координатами
-                x, y = self.vertices[i]
-            self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-            self.ax.annotate(point, (x, y))  # додає анотацію до точки

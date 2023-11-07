@@ -14,7 +14,7 @@ class Rhombus(Shape):
 
     @property
     def vertices(self):
-        """Обчислює вершини ромбу на основі довжини сторони та кута повороту."""
+        """Обчислює вершини ромба на основі довжини сторони та кута повороту."""
         x = [0, self.side_length, 0, -self.side_length]
         y = [self.side_length, 0, -self.side_length, 0]
         return [(xi, yi) for xi, yi in zip(x, y)]

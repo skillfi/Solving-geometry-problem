@@ -13,7 +13,6 @@ class Triangle(Shape):
         self.named_vertices = dict(Point=[], X=[], Y=[])
         self.points = dict()
 
-
     @property
     def vertices(self):
         """Повертає список вершин трикутника на основі довжин сторін."""
@@ -40,38 +39,27 @@ class Triangle(Shape):
         self.ax.add_patch(self.triangle)  # додає полігон до осей
         super().draw()  # викликає метод draw з базового класу Shape
 
-    def init_points(self, points: str, **kwargs):
-        """Додає мітки до вершин трикутника за допомогою модуля matplotlib.pyplot."""
-        for i, point in enumerate(points):
-            x, y = self.vertices[i]  # розпаковує координати вершини
-            self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-            self.ax.annotate(point, (x, y))  # додає анотацію до точки
-            # Оновлює словник та датафрейм з іменами вершин та їх координатами
-            self.named_vertices['Point'].append(point)
-            self.named_vertices['X'].append(x)
-            self.named_vertices['Y'].append(y)
-            self.points[point] = [x, y]
-            self.convert_to_df()
-        # Якщо є параметр parallels, то додає точки та мітки до паралельної лінії
-        if kwargs.get('parallels'):
-            for parallel in kwargs['parallels']:
-                to_parallel = kwargs['parallels'][parallel]
-                for point in to_parallel:
-                    points_t = Triangle.list_to_tuple(self.named_vertices['Point'])
-                    if point not in points_t:
-                        self.named_vertices['Point'].append(point)
-                        x = self.points[parallel[0]][0]
-                        y = self.points[to_parallel[0]][1]
-                        self.named_vertices['X'].append(x)
-                        self.named_vertices['Y'].append(y)
-                        self.points[point] = [x, y]
-                        self.convert_to_df()
-                        x, y = self.df[point]  # розпаковує координати точки
-                        self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-                        self.ax.plot([self.df.loc[0, point], self.df.loc[0, to_parallel[0]]],
-                                     [self.df.loc[1, point], self.df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
-                        self.ax.annotate(point, (x, y))  # додає анотацію до точки
-        if kwargs.get('need'):
-            points = kwargs['need']
-            self.ax.plot([self.df.loc[0, points[0]], self.df.loc[0, points[1]]],
-                         [self.df.loc[1, points[0]], self.df.loc[1, points[1]]], '--', label=points)
+    def parallels(self, lines):
+        for parallel in lines:
+            to_parallel = lines[parallel]
+            for point in to_parallel:
+                points_t = Triangle.list_to_tuple(self.named_vertices['Point'])
+                if point not in points_t:
+                    self.named_vertices['Point'].append(point)
+                    x = self.points[parallel[0]][0]
+                    y = self.points[to_parallel[0]][1]
+                    self.named_vertices['X'].append(x)
+                    self.named_vertices['Y'].append(y)
+                    self.points[point] = [x, y]
+                    self.convert_to_df()
+                    x, y = self.df[point]  # розпаковує координати точки
+                    self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
+                    self.ax.plot([self.df.loc[0, point], self.df.loc[0, to_parallel[0]]],
+                                 [self.df.loc[1, point], self.df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
+                    self.ax.annotate(point, (x, y))  # додає анотацію до точки
+
+    def task(self, need):
+        points = need
+        self.ax.plot([self.df.loc[0, points[0]], self.df.loc[0, points[1]]],
+                     [self.df.loc[1, points[0]], self.df.loc[1, points[1]]], '--', label=points)
+

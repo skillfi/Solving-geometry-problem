@@ -48,9 +48,13 @@ class Parallelogram(Shape):
         # Повертає список вершин
         return vertices
 
+    def diagonals(self):
+        pass
+
     def draw(self):
         """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
-        self.ax.add_patch(self.polygon)  # додає полігон до осей
+        self.ax[0].add_patch(self.polygon)  # додає полігон до осей
+        self.ax[1].add_patch(self.polygon)  # додає полігон до осей
         super().draw()  # викликає метод draw з базового класу Shape
 
     def area(self):

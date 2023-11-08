@@ -1,7 +1,6 @@
-from core.geomentry.shape import Shape
-import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-import pandas as pd
+
+from core.geomentry.shape import Shape
 
 
 class Triangle(Shape):
@@ -12,6 +11,7 @@ class Triangle(Shape):
         self.side_length = side_length
         self.named_vertices = dict(Point=[], X=[], Y=[])
         self.points = dict()
+        self.axes = 0
 
     @property
     def vertices(self):
@@ -36,30 +36,10 @@ class Triangle(Shape):
 
     def draw(self):
         """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
-        self.ax.add_patch(self.triangle)  # додає полігон до осей
+        self.ax[0].add_patch(self.triangle)  # додає полігон до осей
+        self.ax[1].add_patch(self.triangle)  # додає полігон до осей
+        # self.ax[1, 0].add_patch(self.triangle)  # додає полігон до осей
         super().draw()  # викликає метод draw з базового класу Shape
 
-    def parallels(self, lines):
-        for parallel in lines:
-            to_parallel = lines[parallel]
-            for point in to_parallel:
-                points_t = Triangle.list_to_tuple(self.named_vertices['Point'])
-                if point not in points_t:
-                    self.named_vertices['Point'].append(point)
-                    x = self.points[parallel[0]][0]
-                    y = self.points[to_parallel[0]][1]
-                    self.named_vertices['X'].append(x)
-                    self.named_vertices['Y'].append(y)
-                    self.points[point] = [x, y]
-                    self.convert_to_df()
-                    x, y = self.df[point]  # розпаковує координати точки
-                    self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-                    self.ax.plot([self.df.loc[0, point], self.df.loc[0, to_parallel[0]]],
-                                 [self.df.loc[1, point], self.df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
-                    self.ax.annotate(point, (x, y))  # додає анотацію до точки
 
-    def task(self, need):
-        points = need
-        self.ax.plot([self.df.loc[0, points[0]], self.df.loc[0, points[1]]],
-                     [self.df.loc[1, points[0]], self.df.loc[1, points[1]]], '--', label=points)
 

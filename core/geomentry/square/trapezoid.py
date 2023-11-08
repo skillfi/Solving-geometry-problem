@@ -1,3 +1,5 @@
+from matplotlib.patches import Polygon
+
 from core.geomentry.shape import Shape
 
 
@@ -13,6 +15,11 @@ class Trapezoid(Shape):
         self.points = {}
 
     @property
+    def trapezoid(self):
+        """Повертає об'єкт Polygon з модуля matplotlib.patches, що відповідає трикутнику."""
+        return Polygon(self.vertices, closed=True, fill=None)
+
+    @property
     def vertices(self):
         """Повертає вершини трапеції."""
         x0 = 0
@@ -24,3 +31,10 @@ class Trapezoid(Shape):
         y2 = self.height
         y3 = self.height
         return [(x0, y0), (x1, y1), (x2, y2), (x3, y3)]
+
+    def draw(self):
+        """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
+        self.ax[0].add_patch(self.trapezoid)  # додає полігон до осей
+        self.ax[1].add_patch(self.trapezoid)  # додає полігон до осей
+        # self.ax[1, 0].add_patch(self.triangle)  # додає полігон до осей
+        super().draw()  # викликає метод draw з базового класу Shape

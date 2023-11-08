@@ -8,6 +8,7 @@ from core.geomentry.square.trapezoid import Trapezoid
 from core.geomentry.triangles.right_triangle import RightTriangle
 from core.geomentry.triangles.triange import Triangle
 from core.geomentry.square.paralelogram import Parallelogram
+from core.GPT.gpt4free import OpenAi4Free
 
 
 class Geometry:
@@ -23,27 +24,40 @@ class Geometry:
 
     def find_shapes(self):
         return {
-            'triangle': re.compile(r'\sTriangle\s([A-Z]{3})\S', re.IGNORECASE).search(self.text),
+            'triangle': re.compile(r'Triangle\s([A-Z]{3})', re.IGNORECASE).search(self.text),
             'right_triangle': self.triangle_types(),
             'circle': re.compile(r'Circle\s([A-Z]{1})\S', re.IGNORECASE).search(self.text),
             'square': re.compile(r'Square\s([A-Z]{4})\S', re.IGNORECASE).search(self.text),
             'parallelogram': re.compile(r'parallelogram\s([A-Z]{4})\S', re.IGNORECASE).search(string=self.text),
             'rectangle': re.compile(r'Rectangle\s([A-Z]{4})\S', re.IGNORECASE).search(self.text),
-            'trapezoid': re.compile(r'trapezoid\s([A-Z]\d{4})\S', re.IGNORECASE).search(self.text),
+            'trapezoid': re.compile(r'trapezoid\s([A-Z]{4})', re.IGNORECASE).search(self.text),
             'hexagon': re.compile(r'\sHexagon\s([A-Z]{6})\S', re.IGNORECASE).search(string=self.text),
         }
 
     def subElements(self):
         return {
-            'points': re.compile(r'Point\s([A-Z]{1})\sis\son', re.IGNORECASE).search(self.text),
+            'points': self.points(),
             'lines': re.compile(r'\s([A-Z]\d+)\s').search(self.text),
-            'height': re.compile(r'\s([A-Z]{2})\s=').search(self.text) if re.compile(r'\s([A-Z]{2})\s=').search(self.text) else re.compile(r'\s(\d{2})\scm').search(self.text),
+            'height': re.compile(r'\s([A-Z]{2})\s=').search(self.text) if re.compile(r'\s([A-Z]{2})\s=').search(
+                self.text) else re.compile(r'\s(\d{2})\scm').search(self.text),
             'parallels': self.parallel_regex(),
             'angle': re.compile(r'\s(angle)\s([A-Z]{1})\smeasuring\s(\d+)\s(degrees)', re.IGNORECASE).search(self.text)
         }
 
+    def points(self):
+        regex_1 = re.compile(r'Point\s([A-Z]{1})\sis\son', re.IGNORECASE).search(self.text)
+        regex_2 = re.compile(r'Point\s([A-Z]{1})\sis\son\ssegment\s([A-Z]{2})', re.IGNORECASE).search(self.text)
+        if regex_2:
+            result = re.compile(r'Point\s(([A-Z]{1})\sis\son\ssegment\s([A-Z]{2}))\ssuch\sthat\s([A-Z]{2})\s=\s([A-Z]{2})/(\d)\S', re.IGNORECASE).search(self.text)
+            if result:
+                return result
+            return regex_2
+        else:
+            return regex_1
+
     def parallel_regex(self):
-        first_regex = re.compile(r'\s([A-Z]{2})\sis\dparallel\dto\sline\ssegment\s([A-Z]{2})', re.IGNORECASE).search(self.text)
+        first_regex = re.compile(r'\ssegment\s([A-Z]{2})\sis\sparallel\sto\sline\ssegment\s([A-Z]{2})',
+                                 re.IGNORECASE).search(self.text)
         second_regex = re.compile(r'\s(parallel)\ssides\s([A-Z]{2})\sand\s([A-Z]{2})', re.IGNORECASE).search(self.text)
         third_regex = re.compile(r'\s([A-Z]{2})\sis\s(parallel)\sto\s([A-Z]{2})', re.IGNORECASE).search(self.text)
         parallels = (first_regex, second_regex, third_regex)
@@ -52,9 +66,33 @@ class Geometry:
                 return regex
 
     def task(self):
+        def length(text):
+            regex_1 = re.compile(r'find\sthe\slength\s(of\sthe\sother\sside|of\ssides([A-Z]{2})\sand\s([A-Z]{2})|of\s([A-Z]{2})|of\sside\s([A-Z]{2}))',
+                                 re.IGNORECASE).search(text)
+            regex_4 = re.compile(r'find\sthe\slength\s(of\sside\s([A-Z]{2}))',
+                                 re.IGNORECASE).search(text)
+            regex_5 = re.compile(r'calculate\sthe\slength\s(of\sside\s([A-Z]{2}))',
+                                 re.IGNORECASE).search(text)
+            regex_2 = re.compile(
+                r'determine\sthe\slength\s(of\sthe\sother\sside|of\ssides([A-Z]){2}\sand\s([A-Z]{2})|of\s([A-Z]{2})|of\sside\s([A-Z]{2}))\S',
+                re.IGNORECASE).search(text)
+            regex_3 = re.compile(
+                r'\swhat\sis\sthe\s(length|measure)\sof\s(side|segment)\s([A-Z]{2})',
+                re.IGNORECASE).search(text)
+            result = ''
+            for r in (regex_1, regex_2, regex_3, regex_4, regex_5):
+                if r:
+                    for i in r.groups():
+                        result = i
+                        for expr in ('of\tthe\tother\tside', 'of\tsides', 'of\t', 'of\tside\t', 'length\t', 'side\t', 'segment\t', 'measure\t'):
+                            if isinstance(i, str) and expr in i:
+                                result.replace(expr, '\t')
+            return result
+
         return {
-            'measure': re.compile(r'\sfind\sthe\smeasure\sof\sangles\s(A-Z){1}\S(A-Z){1}\sand(A-Z){1}\S', re.IGNORECASE).search(self.text),
-            'length': re.compile(r'\sfind\sthe\slength\s(of\sthe\sother\sside|of\ssides(A-Z){2}\sand\s(A-Z){2})', re.IGNORECASE).search(self.text)
+            'measure': re.compile(r'\sfind\sthe\smeasure\sof\sangles\s([A-Z]{1})\S([A-Z]{1})\sand([A-Z]{1})\S',
+                                  re.IGNORECASE).search(self.text),
+            'length': length(self.text)
         }
 
     def triangle_types(self):
@@ -110,7 +148,13 @@ class Geometry:
                     found_shapes[shape] = match
 
         # Find all the points in the text and store them in a list
-        found_points = self.SubElements['points'].groups() if self.SubElements['points'] else None
+        found_points = None
+        if self.SubElements['points']:
+            if self.SubElements['points'].groups().__len__() > 5:
+                found_points = {}
+                for g in self.SubElements['points'].groups():
+                    pass
+            found_points = self.SubElements['points'].groups()
         # Створення словника для зберігання паралельних рядків
         parallel = {}
         # Знаходження усіх паралельних рядків у тексті
@@ -118,12 +162,16 @@ class Geometry:
             parallels = self.SubElements['parallels'].groups()
             # Додавання кожного паралельного рядка до словника
             parallels = [p for p in parallels if p != 'parallel']
-            for p in parallels:
+            i = 0
+            for p in range(0, len(parallels)):
                 # Видалення слова 'parallel' з кортежу
-                p = tuple(filter(lambda x: x != 'parallel', p))
                 # Якщо кортеж містить два різних елементи, додаємо їх до словника
-                if len(p) == 2 and p[0] != p[1]:
-                    parallel[p] = p[1]
+                arg_0 = parallels[p]
+                arg_1 = parallels[i]
+                d = dict.fromkeys(parallels, arg_1)
+                parallel = d
+                i += 1
+
         # Якщо кортеж містить однакові елементи, ігноруємо їх
         # Знаходження потрібної інформації у тексті
         need = self.Task
@@ -141,7 +189,8 @@ class Geometry:
             # height_segments,  # словник знайдених висот
             parallel,  # словник знайдених паралельних рядків
             need,  # потрібна інформація або None, якщо не знайдена
-            {angles.group(2): int(angles.group(3))} if angles else None # словник знайденого кута або None, якщо не знайдений
+            {angles.group(2): int(angles.group(3))} if angles else None
+        # словник знайденого кута або None, якщо не знайдений
         )
 
     def draw_shape(self):
@@ -166,34 +215,60 @@ class Geometry:
                 if key == 'triangle':
                     shape_obj = shape_class(5.0)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'], points=points)
                 elif key == 'right_triangle':
                     shape_obj = shape_class(10, 3, angle)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'])
                 elif key == 'hexagon':
                     shape_obj = shape_class(5)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'])
                 elif key == 'parallelogram':
                     shape_obj = shape_class(5, 10, 110)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'])
                 elif key == 'trapezoid':
-                    shape_obj = shape_class(top_length=0, bottom_length=0, heigth=0)
+                    shape_obj = shape_class(top_length=5, bottom_length=10, height=10)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'])
                 elif key == 'square':
                     shape_obj = shape_class(side_length=5)
                     shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        shape_obj.parallels(parallels)
+                    if need['length'] != '':
+                        shape_obj.task(need['length'])
                 elif key == 'circle':
                     shape_obj = shape_class(center=[5.0, 5.0])
                     shape_obj.init_points(shape[key])
                 # Малює фігуру
                 shape_obj.draw()
 
-
+# response = OpenAi4Free().generate_geometry_tasks('In triangle XYZ, line segment XY is parallel to line segment ZW. Given that XY = 18 cm, ZW = 12 cm, and ZY = 15 cm, determine the length of XW.')
 # Example usage:
-geometry = Geometry('In square ABCD, point E is the midpoint of side AD. If the length of AB is 8 cm, find the length of segment DE.')
+geometry = Geometry(
+    'In trapezoid ABCD, AB || CD, and angle A measures 80 degrees. If AB = 12 cm and CD = 8 cm, calculate the length of side BC.')
 shapes, points, segments, parallels, need, angle = geometry.find_shapes_and_points()
 print(f"Shapes: {shapes}")
 print(f"Points: {points}")
 print(f"Segments: {segments}")
 # print(f"Height\tSegments: {height_segments}")
 print(f"Parallels: {parallels}")
+print(f"Find: {need}")
 geometry.draw_shape()

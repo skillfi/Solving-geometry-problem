@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -6,14 +7,23 @@ from matplotlib.patches import Polygon
 
 
 class Shape:
+    DataFrame: pd.DataFrame
     """Базовий клас для різних геометричних фігур."""
 
     def __init__(self):
         """Ініціалізує фігуру та осі за допомогою модуля matplotlib.pyplot."""
         self.fig, self.ax = plt.subplots(1, 2)
-        self.df: pd.DataFrame = None
+        self.df: pd.DataFrame = pd.DataFrame()
         self.points = {}
         self.base_points = None
+
+    def diagonals(self, name: List[str], df: pd.DataFrame, mark: str='g-'):
+        for line in name:
+            xy = []
+            new_df = df
+            self.ax[1].plot([new_df.loc[0, line[0]], new_df.loc[0, line[1]]],
+                            [new_df.loc[1, line[0]], new_df.loc[1, line[1]]], mark, label=line)
+
 
     @classmethod
     def from_vertices(cls, vertices):
@@ -22,7 +32,7 @@ class Shape:
         obj.vertices = vertices  # зберігає список вершин як атрибут об'єкта
 
     @classmethod
-    def parallels(cls, lines):
+    def parallels(cls, lines, df: pd.DataFrame):
         for parallel in lines:
             to_parallel = lines[parallel]
             for point in to_parallel:
@@ -34,14 +44,15 @@ class Shape:
                     cls.named_vertices['X'].append(x)
                     cls.named_vertices['Y'].append(y)
                     cls.points[point] = [x, y]
-                    cls().convert_to_df()
-                    x, y = cls.df[point]  # розпаковує координати точки
+                    x, y = df[point]  # розпаковує координати точки
                     cls.ax[1].plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-                    cls.ax[1].plot([cls.df.loc[0, point], cls.df.loc[0, to_parallel[0]]],
-                                   [cls.df.loc[1, point], cls.df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
+                    cls.ax[1].plot([df.loc[0, point], df.loc[0, to_parallel[0]]],
+                                   [df.loc[1, point], df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
                     cls.ax[1].annotate(point, (x, y))  # додає анотацію до точки
 
-    def task(self, need, **kwargs):
+    def task(self, need, df: pd.DataFrame, diagonals: List[str], **kwargs):
+        if diagonals:
+            self.diagonals(diagonals, df, 'g--')
         if need:
             points = need
             point = kwargs.get('points')
@@ -49,29 +60,40 @@ class Shape:
                 for p in point:
                     if 'is on segment' in p:
                         point, segment = re.compile(r'([A-Z]{1})\sis\son\ssegment\s([A-Z]{2})').search(p).groups()
-                        if self.df.loc[0, segment[0]] == 0:
-                            self.df[point.strip()] = [0, self.df.loc[1, segment[0]]/2]
-                        if self.df.loc[1, segment[0]] == 0:
-                            self.df[point.strip()] = [self.df.loc[0, segment[0]]/2, 0]
-                        if self.df.loc[0, segment[0]] == 0 and self.df.loc[1, segment[0]] == 0:
-                            self.df[point.strip()] = [self.df.loc[0, segment[1]] / 2, self.df.loc[1, segment[1]]]
-                        x, y = self.df[point.strip()]
-                        self.ax[1].plot(x ,y, marker='o', label=point)
-                        self.ax[1].annotate(point, (x, y))
+                        if df.loc[0, segment[0]] == 0:
+                            df[point.strip()] = [0, df.loc[1, segment[0]] / 2]
+                        if df.loc[1, segment[0]] == 0:
+                            df[point.strip()] = [df.loc[0, segment[0]] / 2, 0]
+                        if df.loc[0, segment[0]] == 0 and df.loc[1, segment[0]] == 0:
+                            df[point.strip()] = [df.loc[0, segment[1]] / 2,
+                                                             df.loc[1, segment[1]]]
+                        # Використовуємо локальні змінні для зберігання значень x і y
+                        x, y = df[point.strip()]
+                        # Використовуємо генератор списків для створення списку осей
+                        axes = [self.ax[0], self.ax[1]]
+                        # Використовуємо функцію map() для застосування функції plot до кожної осі
+                        list(map(lambda ax: ax.plot(x, y, marker='o', label=point), axes))
+                        # Використовуємо функцію map() для застосування функції annotate до кожної осі
+                        list(map(lambda ax: ax.annotate(point, (x, y)), axes))
             groups = re.compile(r'([A-Z]{1})').search(need).groups()
             for group in groups:
                 if self.points.get(group):
-                    self.ax[1].plot([self.df.loc[0, points[0]], self.df.loc[0, points[1]]],
-                                   [self.df.loc[1, points[0]], self.df.loc[1, points[1]]], 'r-.', label=points)
+                    # Використовуємо генератор списків для створення списку осей
+                    axes = [self.ax[0], self.ax[1]]
+                    # Використовуємо функцію map() для застосування функції plot до кожної осі
+                    list(map(lambda ax: ax.plot([df.loc[0, points[0]], df.loc[0, points[1]]],
+                                                [df.loc[1, points[0]], df.loc[1, points[1]]],
+                                                'r-.',
+                                                label=points + '?'), axes))
 
 
     def ploting(self, x, y, point):
-        self.ax[0].plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-        self.ax[0].annotate(point, (x, y))  # додає анотацію до точки
-        self.ax[1].plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-        self.ax[1].annotate(point, (x, y))  # додає анотацію до точки
-        # self.ax[1, 0].plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-        # self.ax[1, 0].annotate(point, (x, y))  # додає анотацію до точки
+        # Використовуємо генератор списків для створення списку осей
+        axes = [self.ax[0], self.ax[1]]
+        # Використовуємо функцію map() для застосування функції plot до кожної осі
+        list(map(lambda ax: ax.plot(x, y, marker='o', label=point), axes))
+        # Використовуємо функцію map() для застосування функції annotate до кожної осі
+        list(map(lambda ax: ax.annotate(point, (x, y)), axes))
 
     def init_points(self, points: str):
         """Додає мітки до вершин трикутника за допомогою модуля matplotlib.pyplot."""
@@ -85,11 +107,11 @@ class Shape:
             self.named_vertices['X'].append(x)
             self.named_vertices['Y'].append(y)
             self.points[point] = [x, y]
-            self.convert_to_df()
+        return self.convert_to_df()
 
     def convert_to_df(self):
         df = pd.DataFrame(self.points)
-        self.df = df
+        return df
 
     @classmethod
     def from_side_length(cls, side_length):

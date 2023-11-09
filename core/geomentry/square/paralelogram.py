@@ -1,5 +1,7 @@
 import math
 
+import pandas as pd
+
 from core.geomentry.shape import Shape
 
 
@@ -48,8 +50,8 @@ class Parallelogram(Shape):
         # Повертає список вершин
         return vertices
 
-    def diagonals(self):
-        pass
+    def __init_points__(self, points):
+        return super().init_points(points)  # викликаємо метод батьківського класу
 
     def draw(self):
         """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""

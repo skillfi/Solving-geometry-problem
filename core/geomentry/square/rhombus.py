@@ -1,3 +1,5 @@
+from matplotlib.patches import Polygon
+
 from core.geomentry.shape import Shape
 
 
@@ -13,6 +15,11 @@ class Rhombus(Shape):
         self.points = {}
 
     @property
+    def rhombus(self):
+        """Повертає об'єкт Polygon з модуля matplotlib.patches, що відповідає трикутнику."""
+        return Polygon(self.vertices, closed=True, fill=None)
+
+    @property
     def vertices(self):
         """Обчислює вершини ромба на основі довжини сторони та кута повороту."""
         x = [0, self.side_length, 0, -self.side_length]
@@ -20,6 +27,7 @@ class Rhombus(Shape):
         return [(xi, yi) for xi, yi in zip(x, y)]
 
     def draw(self):
-        """Малює ромб на осях та показує його за допомогою модуля matplotlib.pyplot."""
-        self.ax.add_patch(self.polygon)
-        super().draw()  # викликаємо метод батьківського класу для відображення ромбу
+        """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
+        self.ax[0].add_patch(self.rhombus)  # додає полігон до осей
+        self.ax[1].add_patch(self.rhombus)  # додає полігон до осей
+        super().draw()  # викликає метод draw з базового класу Shape

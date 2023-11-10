@@ -8,7 +8,9 @@ class Square(Shape):
         """Ініціалізує квадрат з довжиною сторони."""
         super().__init__()  # викликає конструктор базового класу
         self.side_length = side_length  # зберігає довжину сторони як атрибут об'єкта
-        self.vertices = self.calculate_vertices()  # обчислює та зберігає вершини квадрата
+        self.vertices = self.calculate_vertices()# обчислює та зберігає вершини квадрата
+        self.named_vertices = dict(Point=[], X=[], Y=[])
+        self.points = {}
 
     def calculate_vertices(self):
         """Обчислює координати вершин квадрата."""
@@ -36,20 +38,6 @@ class Square(Shape):
     def __repr__(self):
         """Повертає рядкове представлення квадрата."""
         return f"Квадрат зі стороною {self.side_length} та вершинами {self.vertices}"
-
-    def init_points(self, points: str):
-        """Додає мітки до вершин трикутника за допомогою модуля matplotlib.pyplot."""
-        # Додає точки та мітки до вершин трикутника
-        for i, point in enumerate(points):
-            x, y = self.vertices[i]  # розпаковує координати вершини
-            self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-            self.ax.annotate(point, (x, y))  # додає анотацію до точки
-            # # Оновлює словник та датафрейм з іменами вершин та їх координатами
-            # self.named_vertices['Point'].append(point)
-            # self.named_vertices['X'].append(x)
-            # self.named_vertices['Y'].append(y)
-            # self.points[point] = [x, y]
-            # self.convert_to_df()
 
     def draw(self):
         self.ax.add_patch(self.polygon)

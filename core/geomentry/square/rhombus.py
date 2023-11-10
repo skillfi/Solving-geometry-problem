@@ -30,4 +30,5 @@ class Rhombus(Shape):
         """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
         self.ax[0].add_patch(self.rhombus)  # додає полігон до осей
         self.ax[1].add_patch(self.rhombus)  # додає полігон до осей
+
         super().draw()  # викликає метод draw з базового класу Shape

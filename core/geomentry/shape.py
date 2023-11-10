@@ -1,7 +1,8 @@
 import re
-from typing import List
+from typing import List, Dict
 
 import matplotlib.pyplot as plt
+import pandas
 import pandas as pd
 from matplotlib.patches import Polygon
 
@@ -25,6 +26,7 @@ class Shape:
                             [new_df.loc[1, line[0]], new_df.loc[1, line[1]]], mark, label=line)
 
 
+
     @classmethod
     def from_vertices(cls, vertices):
         """Створює екземпляр класу Shape зі списку вершин."""
@@ -32,7 +34,12 @@ class Shape:
         obj.vertices = vertices  # зберігає список вершин як атрибут об'єкта
 
     @classmethod
-    def parallels(cls, lines, df: pd.DataFrame):
+    def parallels(cls, lines: Dict[str, str], df: pd.DataFrame, only_df: bool):
+        if only_df:
+            for parallel in lines:
+                to_parallel = lines[parallel]
+                df[to_parallel] = [[df.loc[0, to_parallel[0]], df.loc[0, to_parallel[1]]], [[df.loc[1, to_parallel[0]], df.loc[1, to_parallel[1]]]]]
+                return df
         for parallel in lines:
             to_parallel = lines[parallel]
             for point in to_parallel:
@@ -50,7 +57,19 @@ class Shape:
                                    [df.loc[1, point], df.loc[1, to_parallel[0]]], 'g-', label=to_parallel)
                     cls.ax[1].annotate(point, (x, y))  # додає анотацію до точки
 
-    def task(self, need, df: pd.DataFrame, diagonals: List[str], **kwargs):
+    def add_lines_to_df(self, df: pandas.DataFrame):
+        line = ''
+        lines = []
+        for key in df:
+            line.join(['', key])
+            if line.__len__() == 2:
+                lines.append(line)
+                line = ''
+        for l in lines:
+            df[l] = [[df.loc[0, l[0]], df.loc[0, l[1]]], [df.loc[1, l[0]], df.loc[1, l[1]]]]
+        return df
+
+    def task(self, need, df: pd.DataFrame, diagonals: List[str]=False, **kwargs):
         if diagonals:
             self.diagonals(diagonals, df, 'g--')
         if need:
@@ -131,4 +150,7 @@ class Shape:
         self.ax[0].set_xlabel('X')
         self.ax[0].set_ylabel('Y')
         self.ax[0].legend()
+        self.ax[0].axis('off')
+        self.ax[1].axis('off')
+        self.ax[1].legend()
         plt.show()  # показує фігуру

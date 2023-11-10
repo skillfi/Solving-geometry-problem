@@ -1,16 +1,16 @@
 import re
-from typing import List, Tuple
+
+import pandas
 
 from core.geomentry.circle.circle import CircleCustom
 from core.geomentry.square.hexagon import Hexagon
+from core.geomentry.square.paralelogram import Parallelogram
 from core.geomentry.square.rectangle import Rectangle
 from core.geomentry.square.rhombus import Rhombus
 from core.geomentry.square.square import Square
 from core.geomentry.square.trapezoid import Trapezoid
 from core.geomentry.triangles.right_triangle import RightTriangle
 from core.geomentry.triangles.triange import Triangle
-from core.geomentry.square.paralelogram import Parallelogram
-from core.GPT.gpt4free import OpenAi4Free
 
 
 class Geometry:
@@ -33,13 +33,16 @@ class Geometry:
             'triangle': re.compile(r'Triangle\s([A-Z]{3})', re.IGNORECASE).search(self.text),
             'right_triangle': self.triangle_types(),
             'circle': re.compile(r'Circle\s([A-Z]{1})\S', re.IGNORECASE).search(self.text),
-            'square': re.compile(r'Square\s([A-Z]{4})\S', re.IGNORECASE).search(self.text),
-            'parallelogram': re.compile(r'parallelogram\s([A-Z]{4})\S', re.IGNORECASE).search(string=self.text),
-            'rectangle': re.compile(r'Rectangle\s([A-Z]{4})\S', re.IGNORECASE).search(self.text),
+            'square': re.compile(r'([A-Z]{4})', re.IGNORECASE).search(self.text),
+            'parallelogram': re.compile(r'parallelogram\s([A-Z]{4})', re.IGNORECASE).search(string=self.text),
+            'rectangle': re.compile(r'rectangle\s([A-Z]{4})', re.IGNORECASE).search(self.text),
             'trapezoid': re.compile(r'trapezoid\s([A-Z]{4})', re.IGNORECASE).search(self.text),
             'hexagon': re.compile(r'\sHexagon\s([A-Z]{6})\S', re.IGNORECASE).search(string=self.text),
             'rhombus': re.compile(r'\srhombus\s([A-Z]{4})\S', re.IGNORECASE).search(string=self.text),
         }
+
+    def square_types(self, types: str):
+        pass
 
     def subElements(self):
         return {
@@ -219,8 +222,91 @@ class Geometry:
             diagonals
         )
 
+    def send_to_chat_df_data(self):
+        shape, points, segments, parallels, need, angle, diagonals = self.find_shapes_and_points()
+        print(f"1.\tShapes: {shape}\n"
+              f"2.\tPoints: {points}\n"
+              f"3.\tSegments: {segments}\n"
+              f"4.\tOthers:\n\t1)Parallels: {parallels}\n2)\tDiagonals: {diagonals}\n"
+              f"5.\tNeed to find:\n\t1)\tMeasure: {need['measure']}\n\t2)\tFind of side(s): {need['length']}\n\t"
+              f"3)\tFind diagonals: {need['diagonals']}")
+        shape_classes = {
+            'triangle': Triangle,
+            'right_triangle': RightTriangle,
+            'hexagon': Hexagon,
+            'parallelogram': Parallelogram,
+            'trapezoid': Trapezoid,
+            'circle': CircleCustom,
+            'square': Square,
+            'rectangle': Rectangle,
+            'rhombus': Rhombus,
+        }
+        # Ітерує по ключах словника shape
+        for key in shape:
+            # Перевіряє, чи є назва фігури великими літерами
+            if shape[key].isupper():
+                # Знаходить відповідний клас для фігури
+                shape_class = shape_classes[key]
+                # Створює екземпляр класу з потрібними параметрами
+                if key == 'triangle':
+                    shape_obj = shape_class(5.0)
+                    df: pandas.DataFrame = shape_obj.init_points(shape[key])
+                    # if len(parallels) > 1:
+                    #     df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                    # df = shape_obj.add_lines_to_df(df)
+                elif key == 'right_triangle':
+                    shape_obj = shape_class(10, 3, angle)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'hexagon':
+                    shape_obj = shape_class(5)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'parallelogram':
+                    shape_obj = shape_class(5, 10, 110)
+                    df = shape_obj.__init_points__(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'trapezoid':
+                    shape_obj = shape_class(top_length=5, bottom_length=10, height=10)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'square':
+                    shape_obj = shape_class(side_length=5)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'rectangle':
+                    shape_obj = shape_class(6, 4)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'rhombus':
+                    shape_obj = shape_class(10, 60)
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+                elif key == 'circle':
+                    shape_obj = shape_class(center=[5.0, 5.0])
+                    df = shape_obj.init_points(shape[key])
+                    if len(parallels) > 1:
+                        df = shape_obj.parallels(parallels, df, True)
+                    return df, [point for point in shape[key]]
+
     def draw_shape(self):
         shape, points, segments, parallels, need, angle, diagonals = self.find_shapes_and_points()
+
         # Створює словник, що відображає назви фігур на їх класи
         shape_classes = {
             'triangle': Triangle,
@@ -245,28 +331,28 @@ class Geometry:
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'], points=points)
                 elif key == 'right_triangle':
                     shape_obj = shape_class(10, 3, angle)
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                 elif key == 'hexagon':
                     shape_obj = shape_class(5)
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                 elif key == 'parallelogram':
                     shape_obj = shape_class(5, 10, 110)
                     df = shape_obj.__init_points__(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                     if diagonals.__len__() > 1:
                         shape_obj.diagonals(diagonals, df)
@@ -275,21 +361,21 @@ class Geometry:
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                 elif key == 'square':
                     shape_obj = shape_class(side_length=5)
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                 elif key == 'rectangle':
                     shape_obj = shape_class(6, 4)
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:
                         shape_obj.parallels(parallels, df)
-                    if need['length'] != '':
+                    if need['length'] != '' and isinstance(need['length'], str):
                         shape_obj.task(need['length'])
                 elif key == 'rhombus':
                     shape_obj = shape_class(10, 60)
@@ -305,16 +391,3 @@ class Geometry:
                     df = shape_obj.init_points(shape[key])
                 # Малює фігуру
                 shape_obj.draw()
-
-
-# Example usage:
-task = input(f'Write a task:\n')
-geometry = Geometry(task)
-shapes, points, segments, parallels, need, angle, diagonals = geometry.find_shapes_and_points()
-print(f"1.\tShapes: {shapes}\n"
-      f"2.\tPoints: {points}\n"
-      f"3.\tSegments: {segments}\n"
-      f"4.\tOthers:\n\t1)Parallels: {parallels}\n2)\tDiagonals: {diagonals}\n"
-      f"5.\tNeed to find:\n\t1)\tMeasure: {need['measure']}\n\t2)\tFind of side(s): {need['length']}\n\t"
-      f"3)\tFind diagonals: {need['diagonals']}")
-geometry.draw_shape()

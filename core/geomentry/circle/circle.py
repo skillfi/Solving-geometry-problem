@@ -20,11 +20,11 @@ class CircleCustom(Shape):
 
     def draw(self):
         """Малює круг на осях та показує його за допомогою модуля matplotlib.pyplot."""
-        self.ax.add_patch(self.circle)  # Додає об'єкт круга до графіку
+        self.ax[0].add_patch(self.circle)  # Додає об'єкт круга до графіку
         super().draw()  # Викликає метод базового класу для відображення
 
     def init_points(self, point: str):
         x, y = self.center  # розпаковує координати вершини
-        self.ax.plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
-        self.ax.annotate(point, (x, y))  # додає анотацію до точки
+        self.ax[0].plot(x, y, marker='o', label=point)  # додає точку та мітку до осі
+        self.ax[0].annotate(point, (x, y))  # додає анотацію до точки
 

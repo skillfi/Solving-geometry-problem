@@ -34,6 +34,7 @@ class Geometry:
             'right_triangle': self.triangle_types(),
             'circle': re.compile(r'Circle\s([A-Z]{1})\S', re.IGNORECASE).search(self.text),
             'square': re.compile(r'([A-Z]{4})', re.IGNORECASE).search(self.text),
+            'quadrilateral': re.compile(r'quadrilateral\s([A-Z]{4})', re.IGNORECASE).search(self.text),
             'parallelogram': re.compile(r'parallelogram\s([A-Z]{4})', re.IGNORECASE).search(string=self.text),
             'rectangle': re.compile(r'rectangle\s([A-Z]{4})', re.IGNORECASE).search(self.text),
             'trapezoid': re.compile(r'trapezoid\s([A-Z]{4})', re.IGNORECASE).search(self.text),
@@ -238,6 +239,7 @@ class Geometry:
             'trapezoid': Trapezoid,
             'circle': CircleCustom,
             'square': Square,
+            'quadrilateral': Square,
             'rectangle': Rectangle,
             'rhombus': Rhombus,
         }
@@ -279,7 +281,7 @@ class Geometry:
                     if len(parallels) > 1:
                         df = shape_obj.parallels(parallels, df, True)
                     return df, [point for point in shape[key]]
-                elif key == 'square':
+                elif key == 'square' or key == 'quadrilateral':
                     shape_obj = shape_class(side_length=5)
                     df = shape_obj.init_points(shape[key])
                     if len(parallels) > 1:

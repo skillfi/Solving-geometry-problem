@@ -8,9 +8,9 @@ from plotai.code.logger import Logger
 
 from core.GPT.executor.executor import CustomExecutor
 from core.GPT.prompt.prompt import CustomPrompt
-from core.config import api_key
+from core.config import app
 
-openai.api_key = api_key
+openai.api_key = app['config'].get('api_key')
 
 
 class OpenAI:
@@ -18,15 +18,15 @@ class OpenAI:
 
     def __init__(self):
         # Ініціалізує клас з вашим API-ключем
-        self.api_key = api_key
-        openai.api_key = api_key
+        self.api_key = app['config'].get('api_key')
+        openai.api_key = app['config'].get('api_key')
 
     def api(self):
-        openai.api_key = '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'
-        openai.api_base = 'http://127.0.0.1:8090/v1'
+        openai.api_key = app['config'].get('hugging_key')
+        openai.api_base = app['config'].get('host')
 
     # Метод для генерації геометричних завдань
-    def generate_geometry_tasks(self, num_tasks: int, api=False) -> List[str]:
+    def generate_geometry_tasks(self, num_tasks: int, api=app['config'].get('api')) -> List[str]:
         """Генерує список геометричних завдань за допомогою моделі gpt-3.5-turbo.
 
         Параметри:
@@ -64,7 +64,7 @@ class OpenAI:
                     text = text + content
             return text
 
-    def plot(self, task, df, api=False, points=[]):
+    def plot(self, task, df, api=app['config'].get('API'), points=[]):
         p = CustomPrompt(task, df, points=points)
         # streamed completion
         if api:

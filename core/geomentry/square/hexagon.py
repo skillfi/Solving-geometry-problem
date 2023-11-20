@@ -26,30 +26,6 @@ class Hexagon(Shape):
         self.ax[1].add_patch(self.hexagon)  # додає полігон до осей
         super().draw()  # викликає метод draw з базового класу Shape
 
-    @property
-    def vertices(self):
-        """Повертає список вершин шестикутника на основі довжини сторони."""
-        # Знаходить кут між сусідніми вершинами шестикутника
-        angle = math.pi / 3  # 60 градусів у радіанах
-        # Знаходить координати першої вершини шестикутника
-        x0 = 0  # початкова координата x
-        y0 = 0  # початкова координата y
-        # Створює порожній список для зберігання вершин
-        vertices = []
-        # Додає першу вершину до списку
-        vertices.append([x0, y0])
-        # Ітерує по індексах від 1 до 5
-        for i in range(1, 6):
-            # Знаходить координати наступної вершини за формулою
-            # x = x0 + side_length * cos(i * angle)
-            # y = y0 + side_length * sin(i * angle)
-            x = x0 + self.side_length * math.cos(i * angle)
-            y = y0 + self.side_length * math.sin(i * angle)
-            # Додає наступну вершину до списку
-            vertices.append([x, y])
-        # Повертає список вершин
-        return vertices
-
     def area(self):
         """Повертає площу шестикутника за формулою S = (3 * sqrt(3) / 2) * side_length ** 2."""
         return (3 * math.sqrt(3) / 2) * self.side_length ** 2  # обчислює та повертає площу

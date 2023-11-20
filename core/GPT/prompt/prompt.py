@@ -71,17 +71,14 @@ class CustomPrompt(Prompt):
     @property
     def custom_value(self):
         v = f""" 
-        Create a plot in Python with matplotlib package.
-         1.\tDraw the entire figure based on the problem below, plot show contain:\n
-         \t1) Problem:\n\t{self.prompt}
-         \t2)\tGet\tshape\tpoints\tfrom\tproblem;\n
-         \t3)\tGet\tsides,parallels,diagonals,perpendicular and other sides from task;\n
-         \t4)\tGet\tangles\tfrom\tproblem;\n
-         \t5)\tGet\tmidpoints\tfrom\tproblem\t\tand\tadd\tannotation\tif\nnot\texist;\n
-         \t6)\tGet\twhat needs to be found\tfrom\tproblem.\n
-         2.\tUse\tthis\tdataframe:\n\t{self.input_data_str()};
-        3.\tUse:\t\nplt.axes('off');
-        4.\tSave\tplot\t.
+        Create a plot in Python using matplotlib and pandas packages.
+         1.\tMake pandas dataframe based on points (vertices) coordinates, get it from problem bellow:\n
+         \t1)\t{self.prompt};
+         \t2)\tFrom created dataframe plot figure (if figure is shape use Polygon from matplotlib) based on problem;\n
+         \t3)(if figure is shape Connect not connected vertices) else draw condition and annotate only points, angles without formulas and solution;
+         \t4)\tGet all determine conditions from task without solution.\n
+        2.\tUse:\t\nplt.axes('off');
+        3.\tSave\tplot\t.
          
              
         Initial python code to be updated        
@@ -109,4 +106,9 @@ class CustomPrompt(Prompt):
 
     @classmethod
     def geometry_value(cls):
-        return "Generate geometry problems similar to those in textbooks."
+        return "Generate geometry problems similar to those in textbooks (without solution) " \
+               "points have coordinates example: A<x, y> and numerate problem by example: 1]. problem text ."
+    @classmethod
+    def geometry_value_2(cls):
+        return "Generate geometry problems for profile level similar to those in textbooks  (without solution) " \
+               "points have coordinates example: A<x, y> and numerate problem by example: 1]. problem text ."

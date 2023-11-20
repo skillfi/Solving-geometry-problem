@@ -12,15 +12,6 @@ class RightTriangle(Triangle):
         self.angle = angle
 
     @property
-    def vertices(self):
-        """Повертає список вершин прямокутного трикутника на основі основи та висоти."""
-        return [
-            [0, 0],  # ліва нижня вершина
-            [self.side_length, 0],  # права нижня вершина
-            [0, self.height],  # ліва верхня вершина
-        ]
-
-    @property
     def hypotenuse(self):
         """Повертає довжину гіпотенузи прямокутного трикутника за теоремою Піфагора."""
         return math.sqrt(self.side_length ** 2 + self.height ** 2)  # корінь квадратний з суми квадратів катетів

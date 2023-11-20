@@ -20,16 +20,6 @@ class Rectangle(Shape):
         return Polygon(self.vertices, closed=True, fill=None)
 
     @property
-    def vertices(self):
-        """Повертає список вершин прямокутника."""
-        # Обчислює координати вершин за допомогою довжини та ширини
-        x1, y1 = 0, 0  # перша вершина
-        x2, y2 = self.length, 0  # друга вершина
-        x3, y3 = self.length, self.width  # третя вершина
-        x4, y4 = 0, self.width  # четверта вершина
-        return [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]  # повертає список вершин
-
-    @property
     def area(self):
         """Повертає площу прямокутника."""
         return self.length * self.width  # обчислює площу за допомогою довжини та ширини

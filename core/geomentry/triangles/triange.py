@@ -14,15 +14,6 @@ class Triangle(Shape):
         self.axes = 0
 
     @property
-    def vertices(self):
-        """Повертає список вершин трикутника на основі довжин сторін."""
-        return [
-            [0, 0],  # ліва нижня вершина
-            [self.side_length, 0],  # права нижня вершина
-            [self.side_length / 2, self.side_length / 2],  # третя верхня
-        ]
-
-    @property
     def triangle(self):
         """Повертає об'єкт Polygon з модуля matplotlib.patches, що відповідає трикутнику."""
         return Polygon(self.vertices, closed=True, fill=None)

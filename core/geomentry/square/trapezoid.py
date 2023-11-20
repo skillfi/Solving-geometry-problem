@@ -19,19 +19,6 @@ class Trapezoid(Shape):
         """Повертає об'єкт Polygon з модуля matplotlib.patches, що відповідає трикутнику."""
         return Polygon(self.vertices, closed=True, fill=None)
 
-    @property
-    def vertices(self):
-        """Повертає вершини трапеції."""
-        x0 = 0
-        x1 = self.top_length
-        x2 = x1 + (self.bottom_length - self.top_length) / 2
-        x3 = x2 - (self.bottom_length - self.top_length)
-        y0 = 0
-        y1 = 0
-        y2 = self.height
-        y3 = self.height
-        return [(x0, y0), (x1, y1), (x2, y2), (x3, y3)]
-
     def draw(self):
         """Малює трикутник на осях та показує його за допомогою модуля matplotlib.pyplot."""
         self.ax[0].add_patch(self.trapezoid)  # додає полігон до осей

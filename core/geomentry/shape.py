@@ -17,28 +17,26 @@ class Shape:
         self.df: pd.DataFrame = pd.DataFrame()
         self.points = {}
         self.base_points = None
+        self.vertices = []
 
-    def diagonals(self, name: List[str], df: pd.DataFrame, mark: str='g-'):
+    def diagonals(self, name: List[str], df: pd.DataFrame, mark: str = 'g-'):
         for line in name:
             xy = []
             new_df = df
             self.ax[1].plot([new_df.loc[0, line[0]], new_df.loc[0, line[1]]],
                             [new_df.loc[1, line[0]], new_df.loc[1, line[1]]], mark, label=line)
 
-
-
-    @classmethod
-    def from_vertices(cls, vertices):
-        """Створює екземпляр класу Shape зі списку вершин."""
-        obj = cls()  # створює новий об'єкт класу Shape
-        obj.vertices = vertices  # зберігає список вершин як атрибут об'єкта
+    def from_vertices(self, vertices):
+        """Створює екземпляр класу Shape зі списку вершин."""  # створює новий об'єкт класу Shape
+        self.vertices = vertices  # зберігає список вершин як атрибут об'єкта
 
     @classmethod
     def parallels(cls, lines: Dict[str, str], df: pd.DataFrame, only_df: bool):
         if only_df:
             for parallel in lines:
                 to_parallel = lines[parallel]
-                df[to_parallel] = [[df.loc[0, to_parallel[0]], df.loc[0, to_parallel[1]]], [[df.loc[1, to_parallel[0]], df.loc[1, to_parallel[1]]]]]
+                df[to_parallel] = [[df.loc[0, to_parallel[0]], df.loc[0, to_parallel[1]]],
+                                   [[df.loc[1, to_parallel[0]], df.loc[1, to_parallel[1]]]]]
                 return df
         for parallel in lines:
             to_parallel = lines[parallel]
@@ -69,7 +67,7 @@ class Shape:
             df[l] = [[df.loc[0, l[0]], df.loc[0, l[1]]], [df.loc[1, l[0]], df.loc[1, l[1]]]]
         return df
 
-    def task(self, need, df: pd.DataFrame, diagonals: List[str]=False, **kwargs):
+    def task(self, need, df: pd.DataFrame, diagonals: List[str] = False, **kwargs):
         if diagonals:
             self.diagonals(diagonals, df, 'g--')
         if need:
@@ -85,7 +83,7 @@ class Shape:
                             df[point.strip()] = [df.loc[0, segment[0]] / 2, 0]
                         if df.loc[0, segment[0]] == 0 and df.loc[1, segment[0]] == 0:
                             df[point.strip()] = [df.loc[0, segment[1]] / 2,
-                                                             df.loc[1, segment[1]]]
+                                                 df.loc[1, segment[1]]]
                         # Використовуємо локальні змінні для зберігання значень x і y
                         x, y = df[point.strip()]
                         # Використовуємо генератор списків для створення списку осей
@@ -104,7 +102,6 @@ class Shape:
                                                 [df.loc[1, points[0]], df.loc[1, points[1]]],
                                                 'r-.',
                                                 label=points + '?'), axes))
-
 
     def ploting(self, x, y, point):
         # Використовуємо генератор списків для створення списку осей

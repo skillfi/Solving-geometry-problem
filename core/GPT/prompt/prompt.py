@@ -3,7 +3,8 @@ from plotai.plotai import Prompt
 
 
 class CustomPrompt(Prompt):
-    def __init__(self, prompt="", df: pandas.DataFrame=None, x=None, y=None, z=None, previous_code="", previous_error="", data={}, points=[]):
+    def __init__(self, prompt="", df: pandas.DataFrame = None, x=None, y=None, z=None, previous_code="",
+                 previous_error="", data={}, points=[]):
         super().__init__(prompt, df, x, y, z, previous_code, previous_error)
         self.df: pandas.DataFrame = df
         self.points = points
@@ -108,7 +109,18 @@ class CustomPrompt(Prompt):
     def geometry_value(cls):
         return "Generate geometry problems similar to those in textbooks (without solution) " \
                "points have coordinates example: A<x, y> and numerate problem by example: 1]. problem text ."
+
     @classmethod
     def geometry_value_2(cls):
         return "Generate geometry problems for profile level similar to those in textbooks  (without solution) " \
                "points have coordinates example: A<x, y> and numerate problem by example: 1]. problem text ."
+
+    @classmethod
+    def teacher_summary(cls, book_name, author):
+        """
+        Generate a teacher's summary and discussion instructions
+        :param book_name:
+        :param author:
+        :return:
+        """
+        return f"Create a teacher's summary page for the book '{book_name}' by {author}. Provide a brief summary and instructions on how to discuss it."

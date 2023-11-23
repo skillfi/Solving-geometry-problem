@@ -28,7 +28,8 @@ class OpenAI:
         openai.api_base = app['config'].get('host')
 
     # Метод для генерації геометричних завдань
-    def generate_geometry_tasks(self, role: Literal['assistant', 'user', 'teacher'], oai: Literal['chat', 'Completion']) -> List[str]:
+    def generate_geometry_tasks(self, role: Literal['assistant', 'user', 'teacher'],
+                                oai: Literal['chat', 'Completion']) -> List[str]:
         """Генерує список геометричних завдань за допомогою моделі gpt-4-0613.
 
         Модель gpt-4-0613 є новітньою версією моделі gpt-3.5-turbo, яка використовує нейронну мережу з 4 мільярдами параметрів і здатна генерувати складні та цікаві геометричні завдання на різні теми.
@@ -122,7 +123,8 @@ class OpenAI:
             if error is not None:
                 Logger().log({"title": "Error in code execution", "details": error})
 
-    def write_to_file(self, input: int, role: Literal['assistant', 'user', 'teacher'], oai: Literal['chat', 'Completion']) -> None:
+    def write_to_file(self, input: int, role: Literal['assistant', 'user', 'teacher'],
+                      oai: Literal['chat', 'Completion']) -> None:
         """Записує список геометричних завдань у текстовий файл.
 
         Параметри:
@@ -142,3 +144,10 @@ class OpenAI:
             file.write(j_obj)
             file.close()
             print(f"Завдання збережено у файлі '{file.name}'.")
+
+    def summary(self, book, author):
+        p = CustomPrompt.teacher_summary(book, author)
+        if app['config'].get('api'):
+            self.api()
+        chat_completion = self.chat(p, False, 'user')
+        return chat_completion
